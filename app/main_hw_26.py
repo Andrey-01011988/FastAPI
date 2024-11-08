@@ -5,9 +5,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import select, desc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from module_26_fastapi.homework import models_hw_26
-from module_26_fastapi.homework import schemas_hw_26
-from module_26_fastapi.homework.database_hw_26 import engine_26, AsyncSessionApp
+from app import models_hw_26
+from app import schemas_hw_26
+from database_hw_26 import engine_26, AsyncSessionApp
 
 # current_session = AsyncSessionApp()
 

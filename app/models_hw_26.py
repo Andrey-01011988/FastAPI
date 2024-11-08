@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from module_26_fastapi.homework.database_hw_26 import BaseHW
+from database_hw_26 import BaseHW
 
 
 class Recipe(BaseHW):

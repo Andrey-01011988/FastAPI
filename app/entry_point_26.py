@@ -1,6 +1,6 @@
 import uvicorn
 
-from module_26_fastapi.homework.main_hw_26 import app_26
+from main_hw_26 import app_26
 
 
 @app_26.get('/')
