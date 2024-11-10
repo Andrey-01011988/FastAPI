@@ -63,6 +63,15 @@ async def one_recipe(idx: int, current_session: AsyncSession = Depends(get_curre
 async def add_recipe(recipe: schemas_hw_26.RecipeIn, current_session: AsyncSession = Depends(get_current_session)) -> models_hw_26.Recipe:
     """
     Добавить рецепт
+     curl -iX POST http://0.0.0.0:8000/recipes \
+    -H "Content-Type: application/json" \
+    -d '{
+        "title": "Draniki (Potato pancakes)",
+        "cooking_time": 20,
+        "ingredients": "500 g of peeled potatoes; 2 tablespoons of flour; 1 onion; 1 egg; 2 tablespoons of oil; 2–3 tablespoons of milk; salt (about ¾ of a teaspoon); pepper.",
+        "description": "Grate potatoes and give the mass a good squeeze. Put potatoes into the large bowl, add an onion, egg, flour, salt, milk, oil and pepper. Heat some oil in the frying pan. Put some potato mass onto the frying pan with the tablespoon. Fry draniki for 2-3 minutes, then flip them and fry on the other side. Serve hot with sour cream."
+        }'
+
     """
     new_recipe = models_hw_26.Recipe(**dict(recipe))
     async with current_session.begin():

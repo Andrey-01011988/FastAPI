@@ -22,5 +22,5 @@ async def insert_objects(async_session: async_sessionmaker[AsyncSession]) -> Non
             await session.execute(insert(Recipe), DATA)
 
 if __name__ == '__main__':
-    async_session = async_sessionmaker(engine_26, expire_on_commit=False)
-    asyncio.run(insert_objects(async_session))
+    current_async_session = async_sessionmaker(engine_26, expire_on_commit=False)
+    asyncio.run(insert_objects(current_async_session))
