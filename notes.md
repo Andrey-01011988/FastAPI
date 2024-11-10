@@ -52,11 +52,11 @@ Citations:
 
 -----------------------------------------------------------------------------------------------------------------------
 
-Чтобы настроить параллельное выполнение только юнит-тестов и проверки mypy в GitHub Actions, вы можете использовать несколько заданий (jobs) в одном workflow. Это позволит вам запускать юнит-тесты и проверку mypy одновременно, не дожидаясь завершения выполнения одного из них.
+Чтобы использовать матрицы в GitHub Actions для параллельного выполнения тестов и проверки mypy, вы можете настроить ваш файл workflow так, чтобы он использовал стратегию матрицы. Это позволит вам избежать дублирования кода и одновременно запускать тесты и проверку mypy.
 
-Вот пример того, как можно изменить ваш файл настройки workflow для достижения этой цели:
+### Пример настройки с использованием матриц
 
-### Пример файла workflow
+Вот как вы можете изменить ваш файл `.github/workflows/main.yml`, чтобы использовать матрицы для параллельного выполнения:
 
 ```yaml
 name: Push_request_event
@@ -64,13 +64,17 @@ run-name: ${{ github.actor }} is starting Push request testing
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
-jobs: 
-  test:
+jobs:
+  build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        task: [test, mypy]  # Определяем задачи для параллельного выполнения
 
     steps:
       - name: Checkout code
@@ -80,63 +84,46 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.12'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-  run_tests:
-    runs-on: ubuntu-latest
-    needs: test  # Зависимость от job'а test для установки зависимостей
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run unit tests
-        run: pytest -v tests
-        
-  run_mypy:
-    runs-on: ubuntu-latest
-    needs: test  # Зависимость от job'а test для установки зависимостей
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run mypy
-        run: mypy .
+      - name: Run tests or mypy
+        run: |
+          if [ "${{ matrix.task }}" == "test" ]; then
+            pytest -v tests;  # Запуск тестов
+          else
+            mypy .;  # Запуск mypy
+          fi
 ```
 
 ### Объяснение изменений
 
-1. **Создание нескольких jobs**:
-   - Мы создали три job'а:
-     - `test`: устанавливает зависимости.
-     - `run_tests`: запускает юнит-тесты.
-     - `run_mypy`: выполняет проверку mypy.
+1. **Создание матрицы**:
+   - Мы определили `matrix` с переменной `task`, которая содержит два значения: `test` и `mypy`. Это создаст два задания, которые будут выполняться параллельно.
 
-2. **Параллельное выполнение**:
-   - Job'ы `run_tests` и `run_mypy` будут выполняться параллельно после завершения job'а `test`, который устанавливает зависимости. Это достигается с помощью параметра `needs`, который указывает, что обе job'ы зависят от завершения job'а `test`.
+2. **Общие шаги**:
+   - Шаги по проверке кода, настройке Python и установке зависимостей выполняются один раз для обеих задач, что позволяет избежать дублирования кода.
 
-3. **Отдельные шаги**:
-   - Каждый job имеет свои шаги, включая повторный шаг `Checkout code`, чтобы убедиться, что код доступен для выполнения тестов и проверки mypy.
+3. **Условный запуск задач**:
+   - В шаге `Run tests or mypy` используется условие `if`, чтобы определить, какую команду выполнять в зависимости от значения `matrix.task`. Если это `test`, запускаются тесты с помощью `pytest`, если это `mypy`, выполняется проверка типов с помощью `mypy`.
 
 ### Результаты
 
-С помощью этой конфигурации GitHub Actions будет выполнять установку зависимостей в job'е `test`, а затем одновременно запускать юнит-тесты и проверку mypy в отдельных job'ах `run_tests` и `run_mypy`. Это позволяет эффективно использовать ресурсы CI/CD и сократить общее время выполнения workflow.
+С помощью этой конфигурации GitHub Actions будет одновременно выполнять юнит-тесты и проверку mypy в разных job'ах, что улучшит производительность вашего CI/CD процесса и уменьшит дублирование кода в файле workflow.
 
 ### Заключение
 
-Таким образом, вы можете легко настроить параллельное выполнение юнит-тестов и проверки mypy в GitHub Actions, что поможет улучшить производительность вашего процесса CI/CD.
+Использование матриц в GitHub Actions — это эффективный способ управления параллельными задачами. Это позволяет вам легко добавлять новые задачи в будущем, просто добавляя их в массив `task` в матрице.
 
 Citations:
 [1] https://docs.github.com/ru/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs
-[2] https://habr.com/ru/companies/otus/articles/740170/
-[3] https://docs.github.com/ru/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow
-[4] https://docs.github.com/ru/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow?apiVersion=2022-11-28
-[5] https://stackoverflow.com/questions/75607861/github-actions-build-before-tests-actions-order
-[6] https://habr.com/ru/companies/tuturu/articles/531156/
-[7] https://www.youtube.com/watch?v=NijFSs03Pd4
-[8] https://docs.github.com/ru/actions/use-cases-and-examples/building-and-testing
+[2] https://alimbekov.com/beautiful-python-code-simple-steps/
+[3] https://docs.github.com/ru/actions/migrating-to-github-actions/manually-migrating-to-github-actions/migrating-from-jenkins-to-github-actions
+[4] https://coffee-web.ru/blog/how-to-integrate-github-actions-and-ci-cd-with-your-next-python-project/
+[5] https://docs.github.com/ru/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow
+[6] https://dou.ua/forums/topic/34885/
+[7] https://docs.github.com/ru/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow?apiVersion=2022-11-28
+[8] https://docs.github.com/ru/actions/migrating-to-github-actions/manually-migrating-to-github-actions/migrating-from-travis-ci-to-github-actions
