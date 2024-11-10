@@ -35,3 +35,8 @@ urllib3==2.2.3
 uvicorn==0.32.0
 Werkzeug==3.0.6
 
+black==21.12b0
+flake8==4.0.1
+flake8-bugbear==22.1.11
+flake8-pie==0.15.0
+isort==5.9.3
