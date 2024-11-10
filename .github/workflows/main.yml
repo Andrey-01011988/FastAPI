@@ -2,9 +2,9 @@ name: Push_request_event
 run-name: ${{ github.actor }} is starting Push request testing
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-      branches: [ main ]
+      branches: [ main, develop ]
 jobs:
   test:
     runs-on: ubuntu-latest
