@@ -2,7 +2,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from database_test import test_session, engine_test
+from tests.database_test import test_session, engine_test
 from app.main_hw_26 import app_26, get_current_session
 from app.models_hw_26 import BaseHW, Recipe
 
