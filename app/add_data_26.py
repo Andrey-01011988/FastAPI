@@ -3,8 +3,8 @@ import asyncio
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from database_hw_26 import engine_26
-from models_hw_26 import Recipe
+from app.database_hw_26 import engine_26
+from app.models_hw_26 import Recipe
 
 DATA = {
     'title': 'Ленивые пельмени',

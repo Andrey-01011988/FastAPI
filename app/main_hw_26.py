@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models_hw_26
 from app import schemas_hw_26
-from database_hw_26 import engine_26, AsyncSessionApp
+from app.database_hw_26 import engine_26, AsyncSessionApp
 
 # current_session = AsyncSessionApp()
 

@@ -1,6 +1,6 @@
 import uvicorn
 
-from main_hw_26 import app_26
+from app.main_hw_26 import app_26
 
 
 @app_26.get('/')
