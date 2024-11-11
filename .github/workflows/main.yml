@@ -3,9 +3,9 @@ run-name: ${{ github.actor }} is starting Push request testing on branch ${{ git
 
 on:
   push:
-    branches: [ main, release ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, release ]
+    branches: [ main ]
 
 jobs:
   test:
