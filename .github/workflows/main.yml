@@ -8,9 +8,8 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  build:
+  run-tasks:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         task: [test, mypy, black]  # Определяем задачи для параллельного выполнения
@@ -29,12 +28,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests or mypy or black
+      - name: Run tasks
         run: |
-          if [ "${{ matrix.task }}" == "test" ]; then
-            pytest -v tests;  # Запуск тестов
-          elif [ "${{ matrix.task }}" == "black" ]; then
-            black --check --diff --color .;
-          else
-            mypy .;  # Запуск mypy
-          fi
+          case "${{ matrix.task }}" in
+            test)
+              pytest -v tests  # Запуск тестов
+              ;;
+            mypy)
+              mypy .  # Запуск mypy
+              ;;
+            black)
+              black --check --diff --color .  # Проверка стиля кода с помощью black
+              ;;
+          esac
