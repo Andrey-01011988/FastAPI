@@ -34,7 +34,7 @@ jobs:
           if [ "${{ matrix.task }}" == "test" ]; then
             pytest -v tests;  # Запуск тестов
           elif [ "${{ matrix.task }}" == "black" ]; then
-            black --check --diff --color .
+            black --check --diff --color .;
           else
             mypy .;  # Запуск mypy
           fi
