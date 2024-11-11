@@ -8,3 +8,4 @@ aiosqlite
 mypy
 httpx
 pytest-asyncio
+black

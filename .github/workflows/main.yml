@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        task: [test, mypy]  # Определяем задачи для параллельного выполнения
+        task: [test, mypy, black]  # Определяем задачи для параллельного выполнения
 
     steps:
       - name: Checkout code
@@ -29,10 +29,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests or mypy
+      - name: Run tests or mypy or black
         run: |
           if [ "${{ matrix.task }}" == "test" ]; then
             pytest -v tests;  # Запуск тестов
+          if [ "${{ matrix.task }}" == "black" ]; then
+            black --check --diff --color .
           else
             mypy .;  # Запуск mypy
           fi
