@@ -1,5 +1,5 @@
 name: Push_request_event
-run-name: ${{ github.actor }} is starting Push request testing on branch ${{ github.head_ref }}
+run-name: ${{ github.actor }} is starting Push request testing on branch ${{ github.ref }}
 
 on:
   push:
