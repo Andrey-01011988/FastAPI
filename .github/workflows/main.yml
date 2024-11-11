@@ -1,5 +1,5 @@
 name: Push_request_event
-run-name: ${{ github.actor }} is starting Push request testing
+run-name: ${{ github.actor }} is starting Push request testing on branch ${{ github.head_ref }}
 
 on:
   push:
@@ -64,3 +64,41 @@ jobs:
 
       - name: Run black
         run: black --check --diff --color .  # Проверка стиля кода с помощью black
+
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run flake8
+        run: flake8 .
+
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run isort
+        run: isort --check-only .
