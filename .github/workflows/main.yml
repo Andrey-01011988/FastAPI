@@ -8,12 +8,8 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  run-tasks:
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        task: [test, mypy, black]  # Определяем задачи для параллельного выполнения
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,16 +24,43 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tasks
+      - name: Run tests
+        run: pytest -v tests  # Запуск тестов
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
         run: |
-          case "${{ matrix.task }}" in
-            test)
-              pytest -v tests  # Запуск тестов
-              ;;
-            mypy)
-              mypy .  # Запуск mypy
-              ;;
-            black)
-              black --check --diff --color .  # Проверка стиля кода с помощью black
-              ;;
-          esac
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run mypy
+        run: mypy .  # Запуск mypy
+
+  black:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run black
+        run: black --check --diff --color .  # Проверка стиля кода с помощью black
