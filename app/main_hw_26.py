@@ -9,7 +9,6 @@ from app import models_hw_26
 from app import schemas_hw_26
 from app.database_hw_26 import engine_26, AsyncSessionApp
 
-# current_session = AsyncSessionApp()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

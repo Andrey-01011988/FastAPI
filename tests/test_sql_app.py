@@ -16,6 +16,7 @@ async def override_get_session():
 
 app_26.dependency_overrides[get_current_session] = override_get_session
 
+
 @pytest.fixture(scope="module")
 async def setup_database():
     print('Запуск фикстуры')
@@ -42,12 +43,14 @@ async def setup_database():
         # Удалите все таблицы после завершения всех тестов
         await conn.run_sync(BaseHW.metadata.drop_all)
 
+
 @pytest.mark.asyncio
 async def test_all_recipes(setup_database):
     client = TestClient(app_26)
     response = client.get("/recipes")
     assert response.status_code == 200
     assert len(response.json()) > 0  # Проверяем, что есть хотя бы один рецепт
+
 
 @pytest.mark.asyncio
 async def test_one_recipe(setup_database):
@@ -56,6 +59,7 @@ async def test_one_recipe(setup_database):
     # print(response.json())
     assert response.status_code == 200
     assert response.json()["title"] == "Тестовый рецепт"
+
 
 @pytest.mark.asyncio
 async def test_no_recipe_in_db(setup_database):
