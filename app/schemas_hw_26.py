@@ -10,6 +10,7 @@ class RecipeIn(BaseRecipe):
     ingredients: str
     description: str
 
+
 class RecipesOut(BaseRecipe):
     id: int
     views: int
@@ -19,6 +20,7 @@ class RecipesOut(BaseRecipe):
 
     # class Config:
     #     from_attributes = True
+
 
 class OneRecipeOut(BaseRecipe):
     id: int
