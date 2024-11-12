@@ -1,13 +1,12 @@
 from contextlib import asynccontextmanager
 from typing import List, Sequence
 
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import select, desc, update
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy import desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import models_hw_26
-from app import schemas_hw_26
-from app.database_hw_26 import engine_26, AsyncSessionApp
+from app import models_hw_26, schemas_hw_26
+from app.database_hw_26 import AsyncSessionApp, engine_26
 
 
 @asynccontextmanager
@@ -18,6 +17,7 @@ async def lifespan(app: FastAPI):
         yield
     await current_session.close()
     await engine_26.dispose()
+
 
 app_26 = FastAPI(lifespan=lifespan)
 
@@ -31,30 +31,45 @@ async def get_current_session():
         await current_session.close()
 
 
-@app_26.get('/recipes', response_model=List[schemas_hw_26.RecipesOut])
-async def all_recipes(current_session: AsyncSession = Depends(get_current_session)) -> Sequence[models_hw_26.Recipe]:
+@app_26.get("/recipes", response_model=List[schemas_hw_26.RecipesOut])
+async def all_recipes(
+    current_session: AsyncSession = Depends(get_current_session),
+) -> Sequence[models_hw_26.Recipe]:
     """
     Выводит все рецепты пользователю
+
+    curl -i http://0.0.0.0:8000/recipes
     """
     recipe = models_hw_26.Recipe
-    res = await current_session.execute(select(recipe).order_by(desc(recipe.views), recipe.cooking_time))
+    res = await current_session.execute(
+        select(recipe).order_by(desc(recipe.views), recipe.cooking_time)
+    )
 
     return res.scalars().all()
 
 
-@app_26.get('/recipe/{idx}', response_model=schemas_hw_26.OneRecipeOut)
-async def one_recipe(idx: int, current_session: AsyncSession = Depends(get_current_session)) -> models_hw_26.Recipe:
+@app_26.get("/recipe/{idx}", response_model=schemas_hw_26.OneRecipeOut)
+async def one_recipe(
+    idx: int, current_session: AsyncSession = Depends(get_current_session)
+) -> models_hw_26.Recipe:
     """
     Выводит рецепт по id
+
+    curl -i http://0.0.0.0:8000/recipe/1
     """
-    res = await current_session.execute(select(models_hw_26.Recipe).where(models_hw_26.Recipe.id == idx))
+    res = await current_session.execute(
+        select(models_hw_26.Recipe).where(models_hw_26.Recipe.id == idx)
+    )
 
     response = res.scalars().one_or_none()
     if response is None:
-        raise HTTPException(status_code=404, detail='Recipe not found')
+        raise HTTPException(status_code=404, detail="Recipe not found")
 
-    update_views = update(models_hw_26.Recipe).where(models_hw_26.Recipe.id == idx).values(
-                    views=models_hw_26.Recipe.views + 1)
+    update_views = (
+        update(models_hw_26.Recipe)
+        .where(models_hw_26.Recipe.id == idx)
+        .values(views=models_hw_26.Recipe.views + 1)
+    )
 
     await current_session.execute(update_views)
     await current_session.commit()
@@ -62,8 +77,11 @@ async def one_recipe(idx: int, current_session: AsyncSession = Depends(get_curre
     return response
 
 
-@app_26.post('/recipes', response_model=schemas_hw_26.OneRecipeOut, status_code=201)
-async def add_recipe(recipe: schemas_hw_26.RecipeIn, current_session: AsyncSession = Depends(get_current_session)) -> models_hw_26.Recipe:
+@app_26.post("/recipes", response_model=schemas_hw_26.OneRecipeOut, status_code=201)
+async def add_recipe(
+    recipe: schemas_hw_26.RecipeIn,
+    current_session: AsyncSession = Depends(get_current_session),
+) -> models_hw_26.Recipe:
     """
     Добавить рецепт
      curl -iX POST http://0.0.0.0:8000/recipes \

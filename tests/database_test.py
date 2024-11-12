@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 # URL для тестовой базы данных
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

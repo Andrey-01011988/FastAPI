@@ -1,10 +1,9 @@
-
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.database_test import test_session, engine_test
 from app.main_hw_26 import app_26, get_current_session
 from app.models_hw_26 import BaseHW, Recipe
+from tests.database_test import engine_test, test_session
 
 
 # Переопределение сессии приложения для тестирования
@@ -14,26 +13,28 @@ async def override_get_session():
     finally:
         await test_session.close()
 
+
 app_26.dependency_overrides[get_current_session] = override_get_session
 
 
 @pytest.fixture(scope="module")
 async def setup_database():
-    print('Запуск фикстуры')
+    print("Запуск фикстуры")
     async with engine_test.begin() as conn:
         # Создайте все таблицы в тестовой базе данных
-        print('начало')
+        print("начало")
         await conn.run_sync(BaseHW.metadata.create_all)
-        print('тестовая б/д создана')
+        print("тестовая б/д создана")
 
         # Заполнение тестовыми данными
         async with test_session:
             test_recipe = Recipe(
                 title="Тестовый рецепт",
                 cooking_time=30,
-                ingredients='что-то',
-                description='где-то',
-                views=0)
+                ingredients="что-то",
+                description="где-то",
+                views=0,
+            )
             test_session.add(test_recipe)
             await test_session.commit()
 
@@ -55,7 +56,9 @@ async def test_all_recipes(setup_database):
 @pytest.mark.asyncio
 async def test_one_recipe(setup_database):
     client = TestClient(app_26)
-    response = client.get("/recipe/1")  # Предполагается, что ID = 1 для тестового рецепта
+    response = client.get(
+        "/recipe/1"
+    )  # Предполагается, что ID = 1 для тестового рецепта
     # print(response.json())
     assert response.status_code == 200
     assert response.json()["title"] == "Тестовый рецепт"
