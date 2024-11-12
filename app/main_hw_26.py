@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 app_26 = FastAPI(lifespan=lifespan)
 
+
 # Назначение текущей сессии
 async def get_current_session():
     current_session = AsyncSessionApp()
@@ -29,15 +30,17 @@ async def get_current_session():
     finally:
         await current_session.close()
 
+
 @app_26.get('/recipes', response_model=List[schemas_hw_26.RecipesOut])
-async  def all_recipes(current_session: AsyncSession = Depends(get_current_session)) -> Sequence[models_hw_26.Recipe]:
+async def all_recipes(current_session: AsyncSession = Depends(get_current_session)) -> Sequence[models_hw_26.Recipe]:
     """
     Выводит все рецепты пользователю
     """
     recipe = models_hw_26.Recipe
     res = await current_session.execute(select(recipe).order_by(desc(recipe.views), recipe.cooking_time))
-    result = res.scalars().all()
-    return result
+
+    return res.scalars().all()
+
 
 @app_26.get('/recipe/{idx}', response_model=schemas_hw_26.OneRecipeOut)
 async def one_recipe(idx: int, current_session: AsyncSession = Depends(get_current_session)) -> models_hw_26.Recipe:
@@ -51,12 +54,13 @@ async def one_recipe(idx: int, current_session: AsyncSession = Depends(get_curre
         raise HTTPException(status_code=404, detail='Recipe not found')
 
     update_views = update(models_hw_26.Recipe).where(models_hw_26.Recipe.id == idx).values(
-    views=models_hw_26.Recipe.views + 1)
+                    views=models_hw_26.Recipe.views + 1)
 
     await current_session.execute(update_views)
     await current_session.commit()
 
     return response
+
 
 @app_26.post('/recipes', response_model=schemas_hw_26.OneRecipeOut, status_code=201)
 async def add_recipe(recipe: schemas_hw_26.RecipeIn, current_session: AsyncSession = Depends(get_current_session)) -> models_hw_26.Recipe:
