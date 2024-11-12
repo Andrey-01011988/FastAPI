@@ -1,6 +1,7 @@
 import os
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
+from sqlalchemy.ext.asyncio import (AsyncAttrs, async_sessionmaker,
+                                    create_async_engine)
 from sqlalchemy.orm import DeclarativeBase
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -14,5 +15,6 @@ AsyncSessionApp = async_sessionmaker(engine_26, expire_on_commit=False)
 
 class BaseHW(AsyncAttrs, DeclarativeBase):
     pass
+
 
 # current_session = async_session()
