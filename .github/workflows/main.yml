@@ -101,4 +101,5 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run isort
-        run: isort .  # Изменение импортов с помощью isort
+        run: isort --diff .
+
